@@ -31,9 +31,9 @@
 # TODO BY WEDNESDAY March 1st:
 #   Steps 1 & 2 above. Functions:
 #   * getJson [DONE]
-#   - getTsv
-#   - parseDocumentDict
-#   - printDocumentDict for our M1 report
+#   * getTsv [NOT NEEDED?]
+#   * parseDocumentDict [DONE]
+#   * printDocumentDict for our M1 report [DONE]
 ###
 
 ###
