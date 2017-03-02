@@ -1,7 +1,7 @@
 # Lab 3, CS 121
 # Python 3.5
 # Quinn Casey 78016851
-# K dogg
+# Kevin Nguyen 13942307
 # D dogg
 
 ###
