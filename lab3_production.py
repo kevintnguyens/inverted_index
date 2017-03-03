@@ -2,7 +2,7 @@
 # Python 3.5
 # Quinn Casey 78016851
 # Kevin Nguyen 13942307
-# D dogg
+# Dhruti 23968158
 
 ###
 #
@@ -46,6 +46,10 @@
 ###
 # TODO by final due date
 #   - IDK
+###
+
+### To improve runtime -Kevin Also are nice to haves
+#read from inverted index. Saw that we store the index in a json file
 ###
 
 import json
@@ -144,23 +148,41 @@ def printDocumentDict(indexDict):
     print('File size of current index: '+str(os.path.getsize('index.json'))+' bytes')
     
 
-def createInvertedIndex(indexDict):
+#should be turn into update inverted index. This should be ran once
+def createInvertedIndex(indexDict,index_json=''):
     """
     *** Given an index [{'folderID/docID' : {'term' : frequency} }]
     *** 1. Create new index, in the structure of {'term' : ['folderID/docID']}
     *** EDIT STRUCTURE MAYBE? May need to change ['folderID/docID'] to {'folderID/docID' : frequency}
     *** Returns {'term' : ['folderID/docID']}
     """
-
+    #psudo code
+    # Load index_json if file exists
+    # for each doc
+    #   
+    #   set the index_dic[term][doc_id][frequency]
+    #
+    # write it to index_json
+    # return the index_dic
     pass
 
 # POSSIBLY NOT NEEDED??
+# it is needed for m2
 def searchIndexUI():
     """
     *** Prompts user for valid input??? NECESSARY?
     *** Returns a search query string
+    *** this seems rather simple. A simlpe UI would do
+    
     """
-
+    #example of UI
+    #Enter a phrase you want to search. Press enter to search. Press q to quit
+    # Top 5 urls with the words "your query here"
+    #   1.google.com
+    #   2. woow.com
+    #..etc
+    #Enter A phrase you want to search...
+    ##do a while input. Return on input if q
     pass
 
 def searchIndex(inIndex, query):
