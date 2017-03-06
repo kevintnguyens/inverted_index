@@ -2,7 +2,7 @@
 # Python 3.5
 # Quinn Casey 78016851
 # Kevin Nguyen 13942307
-# D dogg
+# Dhruti 23968158
 
 ###
 #
@@ -48,9 +48,14 @@
 #   - IDK
 ###
 
+### To improve runtime -Kevin Also are nice to haves
+#read from inverted index. Saw that we store the index in a json file
+###
+
 import json
 import os.path
 from bs4 import BeautifulSoup
+import time
 
 def getJson(jsonFile):
     """
@@ -87,13 +92,11 @@ def parseDocumentDict(documentDict):
 
     *** TODO LATER (NOT WED):
     *** - Tag support.
-    ***   Differentiate between <p>What's gucci</p> and <h1>What's gucci</h1>
+    ***   Differentiate between <p>What's gucyxzsci</p> and <h1>What's gucci</h1>
     ***   maybe in createInvertedIndex() idk
     """
-
     index = dict()
 
-    #mostly pseudo code
     for docCode in documentDict:
         if(os.path.isfile(docCode)):
             htmlData = open(docCode, 'r', encoding="UTF-8")
@@ -112,7 +115,27 @@ def parseDocumentDict(documentDict):
 
             # append to final index
             index[docCode] = termFreqDict
-        
+
+    # Change {'folderID/docID' : {'term' : frequency} } to
+    # {'term' : {'docCode' : (freq,0)} }
+
+    finalIndex = dict()
+    
+    for docCode in index:
+        for term in index[docCode]:
+            if(term not in finalIndex):
+                finalIndex[term] = []
+            finalIndex[term].append({docCode: (index[docCode][term], 0)})
+
+    
+    
+
+    # Compute TF-IDF
+
+    f = open('indexBEST.json', 'w', encoding="UTF-8")
+    f.write(json.dumps(finalIndex, ensure_ascii=False, indent=2))
+    f.close()
+    
     return index
 
 def printDocumentDict(indexDict):
@@ -137,30 +160,51 @@ def printDocumentDict(indexDict):
     print('Number of unique terms: '+str(len(termSet)))
 
     # Compute size of index file
+    '''
     f = open('index.json', 'w', encoding="UTF-8")
     f.write(json.dumps(indexDict, ensure_ascii=False))
     f.close()
+    '''
 
     print('File size of current index: '+str(os.path.getsize('index.json'))+' bytes')
     
 
-def createInvertedIndex(indexDict):
+#should be turn into update inverted index. This should be ran once
+def createInvertedIndex(indexDict,index_json=''):
     """
     *** Given an index [{'folderID/docID' : {'term' : frequency} }]
     *** 1. Create new index, in the structure of {'term' : ['folderID/docID']}
+    *** 2. Save index into file for later
     *** EDIT STRUCTURE MAYBE? May need to change ['folderID/docID'] to {'folderID/docID' : frequency}
     *** Returns {'term' : ['folderID/docID']}
     """
-
+    #psudo code
+    # Load index_json if file exists
+    # for each doc
+    #   
+    #   set the index_dic[term][doc_id][frequency]
+    #
+    # write it to index_json
+    # return the index_dic
     pass
 
 # POSSIBLY NOT NEEDED??
+# it is needed for m2
 def searchIndexUI():
     """
     *** Prompts user for valid input??? NECESSARY?
     *** Returns a search query string
+    *** this seems rather simple. A simlpe UI would do
+    
     """
-
+    #example of UI
+    #Enter a phrase you want to search. Press enter to search. Press q to quit
+    # Top 5 urls with the words "your query here"
+    #   1.google.com
+    #   2. woow.com
+    #..etc
+    #Enter A phrase you want to search...
+    ##do a while input. Return on input if q
     pass
 
 def searchIndex(inIndex, query):
@@ -183,15 +227,19 @@ if __name__ == "__main__":
     comboDict = getJson('bookkeeping.json')
 
     # Get data from tsv (dict) & append to json data
+    #json dic is in format of dict[path]:url
     comboDict.update(getTsv('bookkeeping.tsv'))
 
     # With the large combined dict, parse through each document
     # structured as {'folderID/docID' : 'documentURL'}
     # Return an index (list of dicts of dicts)
     #   index = [{'folderID/docID' : {'term' : frequency} }]
+    firstTime = time.time()
     simpleDocIndex = parseDocumentDict(comboDict)
-
+    print(time.time()-firstTime)
+    
     # FOR WEDNESDAY ONLY, COMMENT OUT IN PRODUCTION
+
     printDocumentDict(simpleDocIndex)
 
     #    #
