@@ -55,6 +55,7 @@
 import json
 import os.path
 from bs4 import BeautifulSoup
+import time
 
 def getJson(jsonFile):
     """
@@ -115,31 +116,25 @@ def parseDocumentDict(documentDict):
             # append to final index
             index[docCode] = termFreqDict
 
-            '''
-            for term in pureText.split():
-                if(term in index):
-                    # if the term has been searched in the doc, then it has the
-                    #key value
-                    if (docCode==termFreqDict[term][-1].keys):
-                        termFreqDict[term][-1]+=1
-                    else:
-                        index[term].append(
-                        '''
-
     # Change {'folderID/docID' : {'term' : frequency} } to
     # {'term' : {'docCode' : (freq,0)} }
 
+    finalIndex = dict()
+    
     for docCode in index:
-        
+        for term in index[docCode]:
+            if(term not in finalIndex):
+                finalIndex[term] = []
+            finalIndex[term].append({docCode: (index[docCode][term], 0)})
+
+    
     
 
     # Compute TF-IDF
 
-    '''
-    f = open('index.json', 'w', encoding="UTF-8")
-    f.write(json.dumps(indexDict, ensure_ascii=False))
+    f = open('indexBEST.json', 'w', encoding="UTF-8")
+    f.write(json.dumps(finalIndex, ensure_ascii=False, indent=2))
     f.close()
-    '''
     
     return index
 
@@ -239,9 +234,12 @@ if __name__ == "__main__":
     # structured as {'folderID/docID' : 'documentURL'}
     # Return an index (list of dicts of dicts)
     #   index = [{'folderID/docID' : {'term' : frequency} }]
+    firstTime = time.time()
     simpleDocIndex = parseDocumentDict(comboDict)
-
+    print(time.time()-firstTime)
+    
     # FOR WEDNESDAY ONLY, COMMENT OUT IN PRODUCTION
+
     printDocumentDict(simpleDocIndex)
 
     #    #
