@@ -94,7 +94,7 @@ def parseDocumentDict(documentDict):
     ***   Differentiate between <p>What's gucci</p> and <h1>What's gucci</h1>
     ***   maybe in createInvertedIndex() idk
     """
-
+    print(documentDict);
     index = dict()
 
     #mostly pseudo code
@@ -205,6 +205,7 @@ if __name__ == "__main__":
     comboDict = getJson('bookkeeping.json')
 
     # Get data from tsv (dict) & append to json data
+    #json dic is in format of dict[path]:url
     comboDict.update(getTsv('bookkeeping.tsv'))
 
     # With the large combined dict, parse through each document
