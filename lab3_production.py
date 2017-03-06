@@ -91,13 +91,11 @@ def parseDocumentDict(documentDict):
 
     *** TODO LATER (NOT WED):
     *** - Tag support.
-    ***   Differentiate between <p>What's gucci</p> and <h1>What's gucci</h1>
+    ***   Differentiate between <p>What's gucyxzsci</p> and <h1>What's gucci</h1>
     ***   maybe in createInvertedIndex() idk
     """
-    print(documentDict);
     index = dict()
 
-    #mostly pseudo code
     for docCode in documentDict:
         if(os.path.isfile(docCode)):
             htmlData = open(docCode, 'r', encoding="UTF-8")
@@ -116,7 +114,33 @@ def parseDocumentDict(documentDict):
 
             # append to final index
             index[docCode] = termFreqDict
+
+            '''
+            for term in pureText.split():
+                if(term in index):
+                    # if the term has been searched in the doc, then it has the
+                    #key value
+                    if (docCode==termFreqDict[term][-1].keys):
+                        termFreqDict[term][-1]+=1
+                    else:
+                        index[term].append(
+                        '''
+
+    # Change {'folderID/docID' : {'term' : frequency} } to
+    # {'term' : {'docCode' : (freq,0)} }
+
+    for docCode in index:
         
+    
+
+    # Compute TF-IDF
+
+    '''
+    f = open('index.json', 'w', encoding="UTF-8")
+    f.write(json.dumps(indexDict, ensure_ascii=False))
+    f.close()
+    '''
+    
     return index
 
 def printDocumentDict(indexDict):
@@ -141,9 +165,11 @@ def printDocumentDict(indexDict):
     print('Number of unique terms: '+str(len(termSet)))
 
     # Compute size of index file
+    '''
     f = open('index.json', 'w', encoding="UTF-8")
     f.write(json.dumps(indexDict, ensure_ascii=False))
     f.close()
+    '''
 
     print('File size of current index: '+str(os.path.getsize('index.json'))+' bytes')
     
@@ -153,6 +179,7 @@ def createInvertedIndex(indexDict,index_json=''):
     """
     *** Given an index [{'folderID/docID' : {'term' : frequency} }]
     *** 1. Create new index, in the structure of {'term' : ['folderID/docID']}
+    *** 2. Save index into file for later
     *** EDIT STRUCTURE MAYBE? May need to change ['folderID/docID'] to {'folderID/docID' : frequency}
     *** Returns {'term' : ['folderID/docID']}
     """
