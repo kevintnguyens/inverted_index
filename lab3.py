@@ -1,5 +1,5 @@
 # Lab 3
-
+'''
 import json
 import ijson
 
@@ -8,10 +8,11 @@ with open('bookkeeping.json', 'r') as fd:
 
     for item in ijson.items():
         print(item)
-
+p
 #function read_tsv file for dhruti
 #create a function call read_tsv that takes in a file name as a parameter.
 #checs if you can read the file else return nothing
+'''
 '''
  read_tsv(file_name)
     read file
@@ -35,3 +36,21 @@ with open('bookkeeping.json', 'r') as fd:
         path2=line[1]
         url=url
 '''
+#def Dictionary():
+import csv
+with open("bookkeeping.tsv") as f:
+     tsvreader = csv.reader(f, delimiter ="\n")     
+     d = {}
+     for line in tsvreader:
+	if(line):
+	    (k,v) = line[0].split("\t")
+	    d[k]=v
+	#print(line)
+	# (k,v)=line.split("\t")
+	# d[k]=v
+     print(d)
+
+"C:\Users\Dhruti\Desktop\WEBPAGES_SIMPLE\bookkeeping.tsv"
+     #for line in ts
+
+
