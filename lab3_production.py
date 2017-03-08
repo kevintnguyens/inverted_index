@@ -214,7 +214,16 @@ def searchIndexUI():
     #..etc
     #Enter A phrase you want to search...
     ##do a while input. Return on input if q
-    pass
+
+    query = ""
+    while(query is not "q"):
+        # Get user input and save to query
+        # also check if valid
+        print("Please enter a search query")
+
+        results = searchIndex('indexBEST.json', query)
+        for(line in results):
+            print(line)
 
 def searchIndex(inIndexFile, query):
     """
@@ -224,6 +233,8 @@ def searchIndex(inIndexFile, query):
     *** 3. Return an ordered list of ['folderID/docID'] as a search result
     """
 
+    return ['www.google.com', 'www.yahoo.com', 'www.chess.com']
+    '''
     invertedIndex = getJson(inIndexFile)
 
     relevantDocs = {}
@@ -233,6 +244,7 @@ def searchIndex(inIndexFile, query):
         if (term not in invertedIndex):
             pass
         else
+    '''
     
 
 if __name__ == "__main__":
