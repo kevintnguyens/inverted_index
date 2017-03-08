@@ -222,10 +222,12 @@ def searchIndexUI():
         print("Please enter a search query")
 
         results = searchIndex('indexBEST.json', query)
+        '''
         for(line in results):
             print(line)
-
-def searchIndex(inIndexFile, query):
+    '''
+        
+def searchIndex(invertedIndex, comboDict, query):
     """
     *** Given an Inverted Index and query
     *** 1. Compute TF-IDF of documents relative to query
@@ -233,18 +235,30 @@ def searchIndex(inIndexFile, query):
     *** 3. Return an ordered list of ['folderID/docID'] as a search result
     """
 
-    return ['www.google.com', 'www.yahoo.com', 'www.chess.com']
-    '''
-    invertedIndex = getJson(inIndexFile)
-
-    relevantDocs = {}
+    relevantDocs = dict()
+    
     for term in query.split():
+        print("looking for term: "+term)
         #relevantDocs.add(invertedIndex[term])
         # if term does not exist pass. we still want to find other words in the query
-        if (term not in invertedIndex):
-            pass
-        else
-    '''
+        if (term in invertedIndex):
+            for docCode in invertedIndex[term]:
+                docURL = comboDict[docCode[0]]
+
+                print("adding {} ".format(docCode[1][1]))                            
+                if(docURL in relevantDocs):
+                
+                    print("updating {} from {} to {}".format(docCode[0], relevantDocs[docURL], relevantDocs[docURL]+docCode[1][1]))
+                    #print("updating "+docCode[0]+" from "+relevantDocs[docURL]+" to "+relevantDocs[docURL]+str(docCode[1][1]))
+                    relevantDocs[docURL] += docCode[1][1]
+                    
+                else:
+                    relevantDocs[docURL] = docCode[1][1]
+                    
+
+    f = open('returnURLS.json', 'w', encoding="UTF-8")
+    f.write(json.dumps(relevantDocs, ensure_ascii=False, indent=2))
+    f.close()
     
 
 if __name__ == "__main__":
@@ -260,6 +274,11 @@ if __name__ == "__main__":
     #json dic is in format of dict[path]:url
     comboDict.update(getTsv('bookkeeping.tsv'))
 
+    # Write combo dict to file
+    f = open('comboDict.json', 'w', encoding="UTF-8")
+    f.write(json.dumps(comboDict, ensure_ascii=False))
+    f.close()
+
     # With the large combined dict, parse through each document
     # structured as {'folderID/docID' : 'documentURL'}
     # Return an index (list of dicts of dicts)
@@ -274,10 +293,10 @@ if __name__ == "__main__":
     #    #
 
     # Search index for given query
-    '''results = searchIndex(index, "crista lopes") # also the other 2 testing queries
-'''
-
-    results = searchIndex('indexBEST.json', "crista lopes")
+    invertedIndex = getJson('indexBEST.json')
+    if(not comboDict):
+        comboDict = getJson('comboDict.json')
+    results = searchIndex(invertedIndex, comboDict, "machine learning")
     
     # Print query results (all relevant document URLS)
     '''
