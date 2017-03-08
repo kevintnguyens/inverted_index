@@ -57,6 +57,7 @@ import os.path
 from bs4 import BeautifulSoup
 import time
 import math
+import re
 
 def getJson(jsonFile):
     """
@@ -105,6 +106,12 @@ def parseDocumentDict(documentDict):
             #BS.stripTags()
             
             pureText = soup.get_text()
+            # only take alphanumerical words and lower case it
+            # just to narrow down the search results
+            cleanedText=re.sub('[^\w\s+]',' ',pureText)
+            cleanedText=cleanedText.lower()
+            pureText=cleanedText
+            print(pureText)
             termFreqDict = dict()
 
             
@@ -214,7 +221,7 @@ def searchIndexUI():
     #..etc
     #Enter A phrase you want to search...
     ##do a while input. Return on input if q
-
+    '''
     query = ""
     while(query is not "q"):
         # Get user input and save to query
@@ -224,7 +231,7 @@ def searchIndexUI():
         results = searchIndex('indexBEST.json', query)
         for(line in results):
             print(line)
-
+    '''
 def searchIndex(inIndexFile, query):
     """
     *** Given an Inverted Index and query
