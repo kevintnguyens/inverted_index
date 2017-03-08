@@ -58,6 +58,7 @@ from bs4 import BeautifulSoup
 import time
 import math
 import re
+import csv
 
 def getJson(jsonFile):
     """
@@ -78,7 +79,19 @@ def getTsv(tsvFile):
     *** Returns a dict {'folderID/docID' : 'documentURL'}
     """
 
-    return dict()
+    with open(tsvFile) as f:
+        tsvreader = csv.reader(f, delimiter ="\n")     
+        d = {}
+        for line in tsvreader:
+            if(line):
+                (k,v) = line[0].split("\t")
+                d[k]=v
+	#print(line)
+	# (k,v)=line.split("\t")
+	# d[k]=v
+
+
+    return d
 
 
 def parseDocumentDict(documentDict):
@@ -222,24 +235,27 @@ def searchIndexUI():
     #Enter A phrase you want to search...
     ##do a while input. Return on input if q
 
-    
-
+    invertedIndex = getJson('indexBEST.json')
+    comboDict = getJson('comboDict.json')
 	
     query = ""
     while(query is not "q"):
- 	query = raw_input("Please enter your query, or 'q' to quit : ")
-    	print(query)
-	if query is not "q":
-	   results = searchIndex('indexBEST.json', query)
-           for(line in results):
-               print(line)
-	else 
-	   break
+        print("Please enter your query, or 'q' to quit : ")
+        query = input()
+        print(query)
+        if query is not "q":
+            results = searchIndex(invertedIndex, comboDict, query,5)
+            count=0
+            for line in results:
+                count+=1
+                print(str(count)+'. '+line[0])
+        else:
+            break
 #print("Thank you for searching")#exit with a message
  #   	      query = raw_input("Please enter your query, or 'q' to quit : ")#give another chance to type a query?
 	
     
-def searchIndex(invertedIndex, comboDict, query):
+def searchIndex(invertedIndex, comboDict, query, x=5):
 
 
     """
@@ -250,8 +266,9 @@ def searchIndex(invertedIndex, comboDict, query):
     """
 
     relevantDocs = dict()
-    
+            
     for term in query.split():
+        term = (re.sub('[^\w\s+]',' ',term)).lower()
         print("looking for term: "+term)
         #relevantDocs.add(invertedIndex[term])
         # if term does not exist pass. we still want to find other words in the query
@@ -259,20 +276,28 @@ def searchIndex(invertedIndex, comboDict, query):
             for docCode in invertedIndex[term]:
                 docURL = comboDict[docCode[0]]
 
-                print("adding {} ".format(docCode[1][1]))                            
+                #print("adding {} ".format(docCode[1][1]))                            
                 if(docURL in relevantDocs):
                 
-                    print("updating {} from {} to {}".format(docCode[0], relevantDocs[docURL], relevantDocs[docURL]+docCode[1][1]))
+                    #print("updating {} from {} to {}".format(docCode[0], relevantDocs[docURL], relevantDocs[docURL]+docCode[1][1]))
                     #print("updating "+docCode[0]+" from "+relevantDocs[docURL]+" to "+relevantDocs[docURL]+str(docCode[1][1]))
                     relevantDocs[docURL] += docCode[1][1]
                     
                 else:
                     relevantDocs[docURL] = docCode[1][1]
-                    
 
+
+    relevantDocs = sorted(relevantDocs.items(), key=lambda x: x[1], reverse=True)
+    #if docs is greater the amount of urls requested reduce the list size
+    if (len(relevantDocs) > x):
+       relevantDocs=relevantDocs[0:x] 
+    '''
     f = open('returnURLS.json', 'w', encoding="UTF-8")
     f.write(json.dumps(relevantDocs, ensure_ascii=False, indent=2))
     f.close()
+    '''
+
+    return relevantDocs
     
 
 if __name__ == "__main__":
@@ -307,10 +332,8 @@ if __name__ == "__main__":
     #    #
 
     # Search index for given query
-    invertedIndex = getJson('indexBEST.json')
-    if(not comboDict):
-        comboDict = getJson('comboDict.json')
-    results = searchIndex(invertedIndex, comboDict, "machine learning")
+    searchIndexUI()
+    #results = searchIndex(invertedIndex, comboDict, "machine learning")
     
     # Print query results (all relevant document URLS)
     '''
