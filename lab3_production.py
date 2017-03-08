@@ -111,7 +111,7 @@ def parseDocumentDict(documentDict):
             cleanedText=re.sub('[^\w\s+]',' ',pureText)
             cleanedText=cleanedText.lower()
             pureText=cleanedText
-            print(pureText)
+            
             termFreqDict = dict()
 
             
@@ -229,16 +229,14 @@ def searchIndexUI():
         print("Please enter a search query")
 
         results = searchIndex('indexBEST.json', query)
-        '''
+
         for(line in results):
             print(line)
     '''
-<<<<<<< HEAD
+
         
 def searchIndex(invertedIndex, comboDict, query):
-=======
-def searchIndex(inIndexFile, query):
->>>>>>> 961128c7abe1ae9c92c5838f52a7ff3696c0a8bb
+
     """
     *** Given an Inverted Index and query
     *** 1. Compute TF-IDF of documents relative to query
