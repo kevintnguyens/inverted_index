@@ -215,15 +215,22 @@ def searchIndexUI():
     #Enter A phrase you want to search...
     ##do a while input. Return on input if q
 
+    
+
+	
     query = ""
     while(query is not "q"):
-        # Get user input and save to query
-        # also check if valid
-        print("Please enter a search query")
-
-        results = searchIndex('indexBEST.json', query)
-        for(line in results):
-            print(line)
+ 	query = raw_input("Please enter your query, or 'q' to quit : ")
+    	print(query)
+	if query is not "q":
+	   results = searchIndex('indexBEST.json', query)
+           for(line in results):
+               print(line)
+	else 
+	   break
+#print("Thank you for searching")#exit with a message
+ #   	      query = raw_input("Please enter your query, or 'q' to quit : ")#give another chance to type a query?
+	
 
 def searchIndex(inIndexFile, query):
     """
