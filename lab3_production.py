@@ -56,6 +56,7 @@ import json
 import os.path
 from bs4 import BeautifulSoup
 import time
+import math
 
 def getJson(jsonFile):
     """
@@ -118,20 +119,28 @@ def parseDocumentDict(documentDict):
 
     # Change {'folderID/docID' : {'term' : frequency} } to
     # {'term' : {'docCode' : (freq,0)} }
-
     finalIndex = dict()
     
     for docCode in index:
         for term in index[docCode]:
             if(term not in finalIndex):
                 finalIndex[term] = []
-            finalIndex[term].append({docCode: (index[docCode][term], 0)})
+            finalIndex[term].append( (docCode, (index[docCode][term], 0)) )
 
-    
-    
 
     # Compute TF-IDF
+    # TF: (1+log(finalIndex[term][docCode][0])) x log(len(index) / len(finalIndex[term]))
+    
+    for term in finalIndex:
+        for i in range(len(finalIndex[term])):
+            docCode = finalIndex[term][i][0]
+            freq_of_doc = finalIndex[term][i][1][0] 
+            final_value = (1 + math.log(freq_of_doc)) * math.log(len(index) / len(finalIndex[term]))
+            new_tupple=(docCode,(freq_of_doc,final_value))
+            # * math.log(len(index) / len(finalIndex[term]))
+            finalIndex[term][i]=new_tupple
 
+    # Write to new index
     f = open('indexBEST.json', 'w', encoding="UTF-8")
     f.write(json.dumps(finalIndex, ensure_ascii=False, indent=2))
     f.close()
@@ -207,7 +216,7 @@ def searchIndexUI():
     ##do a while input. Return on input if q
     pass
 
-def searchIndex(inIndex, query):
+def searchIndex(inIndexFile, query):
     """
     *** Given an Inverted Index and query
     *** 1. Compute TF-IDF of documents relative to query
@@ -215,7 +224,16 @@ def searchIndex(inIndex, query):
     *** 3. Return an ordered list of ['folderID/docID'] as a search result
     """
 
-    pass
+    invertedIndex = getJson(inIndexFile)
+
+    relevantDocs = {}
+    for term in query.split():
+        #relevantDocs.add(invertedIndex[term])
+        # if term does not exist pass. we still want to find other words in the query
+        if (term not in invertedIndex):
+            pass
+        else
+    
 
 if __name__ == "__main__":
 
@@ -234,24 +252,20 @@ if __name__ == "__main__":
     # structured as {'folderID/docID' : 'documentURL'}
     # Return an index (list of dicts of dicts)
     #   index = [{'folderID/docID' : {'term' : frequency} }]
-    firstTime = time.time()
-    simpleDocIndex = parseDocumentDict(comboDict)
-    print(time.time()-firstTime)
+    parseDocumentDict(comboDict)
     
     # FOR WEDNESDAY ONLY, COMMENT OUT IN PRODUCTION
-
-    printDocumentDict(simpleDocIndex)
+    # printDocumentDict(simpleDocIndex)
 
     #    #
     # M2 #
     #    #
 
-    # Create legit inverted index
-    '''index = createInvertedIndex(simpleDocIndex)'''
-
     # Search index for given query
     '''results = searchIndex(index, "crista lopes") # also the other 2 testing queries
 '''
+
+    results = searchIndex('indexBEST.json', "crista lopes")
     
     # Print query results (all relevant document URLS)
     '''
