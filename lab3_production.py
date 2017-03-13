@@ -261,36 +261,39 @@ def searchIndex(invertedIndex, comboDict, query, x=5):
     """
 
     relevantDocs = dict()
-            
+   
+    print("looking for  "+query)
+
+    #clean the query string so its alphanumeric lower for searching through the
+    #inverted index
+    query=(re.sub('[^\w\s+]',' ',query)).lower()
+
+    #split the query into mutiple tokens to be search
     for term in query.split():
-        term = (re.sub('[^\w\s+]',' ',term)).lower()
-        print("looking for term: "+term)
-        #relevantDocs.add(invertedIndex[term])
-        # if term does not exist pass. we still want to find other words in the query
+
+        # if term does not exist pass. If no terms found return null
+        # if terms were found in the index
         if (term in invertedIndex):
+            # look through all documents for the term.
+            #each document has url and the idf score with it to use
             for docCode in invertedIndex[term]:
                 docURL = comboDict[docCode[0]]
 
-                #print("adding {} ".format(docCode[1][1]))                            
+                #here we are appending all the idf score for urls found
+                #if the url is in relevant doc. append the idf score for that url
+                #else set the url to equal to the current idf score
                 if(docURL in relevantDocs):
                 
-                    #print("updating {} from {} to {}".format(docCode[0], relevantDocs[docURL], relevantDocs[docURL]+docCode[1][1]))
-                    #print("updating "+docCode[0]+" from "+relevantDocs[docURL]+" to "+relevantDocs[docURL]+str(docCode[1][1]))
                     relevantDocs[docURL] += docCode[1][1]
                     
                 else:
                     relevantDocs[docURL] = docCode[1][1]
 
-
+    #sort the found documents from highest idf to lowest
     relevantDocs = sorted(relevantDocs.items(), key=lambda x: x[1], reverse=True)
     #if docs is greater the amount of urls requested reduce the list size
     if (len(relevantDocs) > x):
        relevantDocs=relevantDocs[0:x]
-    '''
-    f = open('returnURLS.json', 'w', encoding="UTF-8")
-    f.write(json.dumps(relevantDocs, ensure_ascii=False, indent=2))
-    f.close()
-    '''
 
     return relevantDocs
     
