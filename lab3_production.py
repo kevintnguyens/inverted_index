@@ -2,7 +2,7 @@
 # Python 3.5
 # Quinn Casey 78016851
 # Kevin Nguyen 13942307
-# Dhruti 23968158
+# Dhruti Khetani 23968158
 
 ###
 #
@@ -74,24 +74,23 @@ def getJson(jsonFile):
 
 def getTsv(tsvFile):
     """
-    *** Reads a tsv file, splits by newlines & spaces?
-    *** NOTE: READ USING BLOCKS OR WHATEVER. NOT ALL AT ONCE
+    *** Reads a tsv file, splits by newlines & spaces
     *** Returns a dict {'folderID/docID' : 'documentURL'}
-    """
+"""
 
-    with open(tsvFile) as f:
-        tsvreader = csv.reader(f, delimiter ="\n")     
-        d = {}
-        for line in tsvreader:
-            if(line):
-                (k,v) = line[0].split("\t")
-                d[k]=v
+    with open(tsvFile) as csvFile: 
+        tsvreader = csv.reader(csvFile, delimiter ="\n") #read the data and seperate it by newlines   
+        dictionary = {} #create a dictionary
+        for line in tsvreader: #for each seperated line in tsvreader
+            if(line): #if there is a line
+                (keys,values) = line[0].split("\t") #seperate with a tab, where the keys='folderID/docID' & values = 'documentURL'
+                d[keys]=values
 	#print(line)
 	# (k,v)=line.split("\t")
 	# d[k]=v
 
 
-    return d
+    return dictionary
 
 
 def parseDocumentDict(documentDict):
@@ -217,10 +216,8 @@ def printDocumentDict(indexDict):
 # it is needed for m2
 def searchIndexUI():
     """
-    *** Prompts user for valid input??? NECESSARY?
-    *** Returns a search query string
-    *** this seems rather simple. A simlpe UI would do
-    
+    *** Prompts user for valid input
+    *** Returns a search query string  
     """
     #example of UI
     #Enter a phrase you want to search. Press enter to search. Press q to quit
@@ -231,14 +228,15 @@ def searchIndexUI():
     #Enter A phrase you want to search...
     ##do a while input. Return on input if q
 
-    invertedIndex = getJson('indexBEST.json')
+    invertedIndex = getJson('indexBEST.json')  
     comboDict = getJson('comboDict.json')
 	
-    query = ""
-    while(query is not "q"):
-        print("Please enter your query, or 'q' to quit : ")
-        query = input()
+    query = "" #given query is an empty string
+    while(query is not "q"): #since query is an empty string aka not q, the loop will run atleast once
+        print("Please enter your query, or 'q' to quit : ") #have the user input a query, or quit
+        query = input() #the user entered query is saved in the variable "query"
         print(query)
+
         if query is not "q":
             results = searchIndex(invertedIndex, comboDict, query,5)
             count=0
