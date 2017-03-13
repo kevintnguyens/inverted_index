@@ -111,21 +111,38 @@ def parseDocumentDict(documentDict):
     """
     index = dict()
 
+    TAG_MODIFIERS = {'title':2.0, 'h1':1.5, 'h2':1.4, 'h3':1.3, 'h4':1.2, 'h5':1.1, 'h6':1.05, 'p':1, 'strong':1.4, 'b': 1.4};
+    modifiedFreqDict = dict()
+    
     for docCode in documentDict:
         if(os.path.isfile(docCode)):
             htmlData = open(docCode, 'r', encoding="UTF-8")
             soup = BeautifulSoup(htmlData, 'html.parser')
-            #BS.stripTags()
+
+            modifiedDict = dict()           
+    
+            # FIRST, get important tags
+            for tagName in TAG_MODIFIERS.keys():
+                tagData = soup.find_all(tagName)
+                for tag in tagData:
+
+                    # cleans text
+                    tagData = (re.sub('[^\w\s+]',' ', tag.get_text())).lower()
+                    for term in tagData.split():
+                        if(term in modifiedDict):
+                            modifiedDict[term] += TAG_MODIFIERS[tagName]
+                        else:
+                            modifiedDict[term] = TAG_MODIFIERS[tagName]
+
+            termFreqDict = dict()
             
+            # now work the the remaining text
             pureText = soup.get_text()
+            
             # only take alphanumerical words and lower case it
             # just to narrow down the search results
-            cleanedText=re.sub('[^\w\s+]',' ',pureText)
-            cleanedText=cleanedText.lower()
+            cleanedText=(re.sub('[^\w\s+]',' ',pureText)).lower()
             pureText=cleanedText
-            
-            termFreqDict = dict()
-
             
             for term in pureText.split():
                 if(term in termFreqDict):
@@ -135,7 +152,8 @@ def parseDocumentDict(documentDict):
 
             # append to final index
             index[docCode] = termFreqDict
-
+            if(modifiedDict): modifiedFreqDict[docCode] = modifiedDict
+            
     # Change {'folderID/docID' : {'term' : frequency} } to
     # {'term' : {'docCode' : (freq,0)} }
     finalIndex = dict()
@@ -148,13 +166,16 @@ def parseDocumentDict(documentDict):
 
 
     # Compute TF-IDF
-    # TF: (1+log(finalIndex[term][docCode][0])) x log(len(index) / len(finalIndex[term]))
-    
     for term in finalIndex:
         for i in range(len(finalIndex[term])):
             docCode = finalIndex[term][i][0]
             freq_of_doc = finalIndex[term][i][1][0] 
             final_value = (1 + math.log(freq_of_doc)) * math.log(len(index) / len(finalIndex[term]))
+
+            # If the term has a modifier, append to final value score
+            if(docCode in modifiedFreqDict and term in modifiedFreqDict[docCode]):
+                final_value += modifiedFreqDict[docCode][term]
+            
             new_tupple=(docCode,(freq_of_doc,final_value))
             # * math.log(len(index) / len(finalIndex[term]))
             finalIndex[term][i]=new_tupple
@@ -188,33 +209,8 @@ def printDocumentDict(indexDict):
     print('Number of unique terms: '+str(len(termSet)))
 
     # Compute size of index file
-    '''
-    f = open('index.json', 'w', encoding="UTF-8")
-    f.write(json.dumps(indexDict, ensure_ascii=False))
-    f.close()
-    '''
 
     print('File size of current index: '+str(os.path.getsize('index.json'))+' bytes')
-    
-
-#should be turn into update inverted index. This should be ran once
-def createInvertedIndex(indexDict,index_json=''):
-    """
-    *** Given an index [{'folderID/docID' : {'term' : frequency} }]
-    *** 1. Create new index, in the structure of {'term' : ['folderID/docID']}
-    *** 2. Save index into file for later
-    *** EDIT STRUCTURE MAYBE? May need to change ['folderID/docID'] to {'folderID/docID' : frequency}
-    *** Returns {'term' : ['folderID/docID']}
-    """
-    #psudo code
-    # Load index_json if file exists
-    # for each doc
-    #   
-    #   set the index_dic[term][doc_id][frequency]
-    #
-    # write it to index_json
-    # return the index_dic
-    pass
 
 # POSSIBLY NOT NEEDED??
 # it is needed for m2
@@ -248,13 +244,12 @@ def searchIndexUI():
                 print(str(count)+'. '+line[0])
         else:
             break
+        
 #print("Thank you for searching")#exit with a message
- #   	      query = raw_input("Please enter your query, or 'q' to quit : ")#give another chance to type a query?
+#query = raw_input("Please enter your query, or 'q' to quit : ")#give another chance to type a query?
 	
     
 def searchIndex(invertedIndex, comboDict, query, x=5):
-
-
     """
     *** Given an Inverted Index and query
     *** 1. Compute TF-IDF of documents relative to query
@@ -263,36 +258,39 @@ def searchIndex(invertedIndex, comboDict, query, x=5):
     """
 
     relevantDocs = dict()
-            
+   
+    print("looking for  "+query)
+
+    #clean the query string so its alphanumeric lower for searching through the
+    #inverted index
+    query=(re.sub('[^\w\s+]',' ',query)).lower()
+
+    #split the query into mutiple tokens to be search
     for term in query.split():
-        term = (re.sub('[^\w\s+]',' ',term)).lower()
-        print("looking for term: "+term)
-        #relevantDocs.add(invertedIndex[term])
-        # if term does not exist pass. we still want to find other words in the query
+
+        # if term does not exist pass. If no terms found return null
+        # if terms were found in the index
         if (term in invertedIndex):
+            # look through all documents for the term.
+            #each document has url and the idf score with it to use
             for docCode in invertedIndex[term]:
                 docURL = comboDict[docCode[0]]
 
-                #print("adding {} ".format(docCode[1][1]))                            
+                #here we are appending all the idf score for urls found
+                #if the url is in relevant doc. append the idf score for that url
+                #else set the url to equal to the current idf score
                 if(docURL in relevantDocs):
                 
-                    #print("updating {} from {} to {}".format(docCode[0], relevantDocs[docURL], relevantDocs[docURL]+docCode[1][1]))
-                    #print("updating "+docCode[0]+" from "+relevantDocs[docURL]+" to "+relevantDocs[docURL]+str(docCode[1][1]))
                     relevantDocs[docURL] += docCode[1][1]
                     
                 else:
                     relevantDocs[docURL] = docCode[1][1]
 
-
+    #sort the found documents from highest idf to lowest
     relevantDocs = sorted(relevantDocs.items(), key=lambda x: x[1], reverse=True)
     #if docs is greater the amount of urls requested reduce the list size
     if (len(relevantDocs) > x):
-       relevantDocs=relevantDocs[0:x] 
-    '''
-    f = open('returnURLS.json', 'w', encoding="UTF-8")
-    f.write(json.dumps(relevantDocs, ensure_ascii=False, indent=2))
-    f.close()
-    '''
+       relevantDocs=relevantDocs[0:x]
 
     return relevantDocs
     
