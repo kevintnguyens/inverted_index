@@ -242,9 +242,12 @@ def searchIndexUI():
         if query is not "q":
             results = searchIndex(invertedIndex, comboDict, query,5)
             count=0
-            for line in results:
-                count+=1
-                print(str(count)+'. '+line[0])
+            if(results):
+                for line in results:
+                    count+=1
+                    print(str(count)+'. '+line[0])
+            else:
+                print("Query not found")
         else:
             break
         
