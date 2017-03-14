@@ -76,7 +76,7 @@ def getTsv(tsvFile):
     """
     *** Reads a tsv file, splits by newlines & spaces
     *** Returns a dict {'folderID/docID' : 'documentURL'}
-"""
+    """
 
     with open(tsvFile) as csvFile: 
         tsvreader = csv.reader(csvFile, delimiter ="\n") #read the data and seperate it by newlines   
@@ -84,7 +84,7 @@ def getTsv(tsvFile):
         for line in tsvreader: #for each seperated line in tsvreader
             if(line): #if there is a line
                 (keys,values) = line[0].split("\t") #seperate with a tab, where the keys='folderID/docID' & values = 'documentURL'
-                d[keys]=values
+                dictionary[keys]=values
 	#print(line)
 	# (k,v)=line.split("\t")
 	# d[k]=v
