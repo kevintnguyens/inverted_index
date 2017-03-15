@@ -290,6 +290,8 @@ def searchIndex(invertedIndex, comboDict, query, x=5):
                 else:
                     relevantDocs[docURL] = docCode[1][1]
 
+    print("Found "+str(len(relevantDocs))+" results!")
+
     #sort the found documents from highest idf to lowest
     relevantDocs = sorted(relevantDocs.items(), key=lambda x: x[1], reverse=True)
     #if docs is greater the amount of urls requested reduce the list size
